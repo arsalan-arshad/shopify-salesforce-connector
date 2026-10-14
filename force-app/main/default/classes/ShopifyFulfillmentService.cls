@@ -51,7 +51,6 @@ public with sharing class ShopifyFulfillmentService {
             SELECT Id, Shopify_Order_Id__c, Shopify_Order_Number__c
             FROM Order
             WHERE Id = :orderId
-            WITH USER_MODE
             LIMIT 1
         ];
 
@@ -115,13 +114,13 @@ public with sharing class ShopifyFulfillmentService {
                 res.message = log.Error_Message__c;
             }
 
-            insert as user log;
+            insert log;
 
         } catch (Exception ex) {
             log.Status__c = 'Failed';
             log.Error_Message__c = ex.getMessage() + '\n' + ex.getStackTraceString();
             log.Execution_Time_Ms__c = System.currentTimeMillis() - startTime;
-            insert as user log;
+            insert log;
 
             res.isSuccess = false;
             res.message = ex.getMessage();

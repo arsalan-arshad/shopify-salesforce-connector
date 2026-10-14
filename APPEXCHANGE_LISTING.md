@@ -16,7 +16,7 @@ This dossier contains the complete listing metadata, marketing copy, technical d
 | **Secondary Categories** | **Sales Utilities**, **Customer Service**, **ERP &amp; Inventory**                                                       | AppExchange Secondary    |
 | **Target Audience**      | E-Commerce Brands, Salesforce Admins, Direct-to-Consumer (D2C) &amp; B2B Stores                                          | All Orgs                 |
 | **Supported Editions**   | Essentials, Professional, Enterprise, Unlimited, Developer                                                               | All editions with Orders |
-| **Package Version ID**   | `04tg7000000WE31AAG` (`v0.1.0-1`)                                                                                        | Released 2GP Package     |
+| **Package Version ID**   | `04tg7000000XZWrAAO` (`v0.1.0-1`)                                                                                        | Released 2GP Package     |
 | **Source Repository**    | [github.com/arsalan-arshad/shopify-salesforce-connector](https://github.com/arsalan-arshad/shopify-salesforce-connector) | Public MIT               |
 
 ---
@@ -123,6 +123,6 @@ All visual assets have been crafted to exact Salesforce AppExchange specificatio
 
 | Target Environment                 | Direct 1-Click Link                                                                                                                          |
 | :--------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Production / Developer Edition** | [👉 Install in Production / Dev Org (04tg7000000WE31AAG)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG) |
-| **Sandbox Environment**            | [👉 Install in Sandbox (04tg7000000WE31AAG)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG)               |
-| **Salesforce CLI**                 | `sf package install --package 04tg7000000WE31AAG --wait 20 --target-org <YOUR_ORG_ALIAS>`                                                    |
+| **Production / Developer Edition** | [👉 Install in Production / Dev Org (04tg7000000XZWrAAO)](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO) |
+| **Sandbox Environment**            | [👉 Install in Sandbox (04tg7000000XZWrAAO)](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO)               |
+| **Salesforce CLI**                 | `sf package install --package 04tg7000000XZWrAAO --wait 20 --target-org <YOUR_ORG_ALIAS>`                                                    |

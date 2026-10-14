@@ -91,8 +91,7 @@ private class ShopifyWebhookRestServiceTest {
 
     @IsTest
     static void testMissingSecretValidation() {
-        // Clear secret
-        Shopify_Setting__c settings = Shopify_Setting__c.getInstance();
+        Shopify_Setting__c settings = [SELECT Id, Shared_Secret__c FROM Shopify_Setting__c LIMIT 1];
         settings.Shared_Secret__c = null;
         update settings;
 

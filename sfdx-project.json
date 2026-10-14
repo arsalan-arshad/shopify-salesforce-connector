@@ -14,7 +14,7 @@
   "sfdcLoginUrl": "https://login.salesforce.com",
   "sourceApiVersion": "61.0",
   "packageAliases": {
-    "ShopifySalesforceConnector": "0Hog70000003qksCAA",
-    "ShopifySalesforceConnector@0.1.0-1": "04tg7000000WE31AAG"
+    "ShopifySalesforceConnector": "0Hog700000047m5CAA",
+    "ShopifySalesforceConnector@0.1.0-1": "04tg7000000XZWrAAO"
   }
 }

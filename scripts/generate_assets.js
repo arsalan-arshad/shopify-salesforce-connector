@@ -102,7 +102,7 @@ const bannerHtml = `
     </div>
     <div class="brand-footer">
       <div class="author">Built by Arsalan Arshad &bull; Salesforce Open-Source Ecosystem Portfolio</div>
-      <div style="font-weight: 800; font-size: 18px; color: #86efac;">Package 04tg7000000WE31AAG</div>
+      <div style="font-weight: 800; font-size: 18px; color: #86efac;">Package 04tg7000000XZWrAAO</div>
     </div>
   </div>
 </body>

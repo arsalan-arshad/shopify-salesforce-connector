@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/arsalan-arshad/shopify-salesforce-connector/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-green.svg" alt="License: MIT"></a>
-  <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG"><img src="https://img.shields.io/badge/2GP%20Package-04tg7000000WE31AAG-0176D3.svg" alt="2GP Package"></a>
+  <a href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO"><img src="https://img.shields.io/badge/2GP%20Package-04tg7000000XZWrAAO-0176D3.svg" alt="2GP Package"></a>
   <a href="https://github.com/arsalan-arshad/shopify-salesforce-connector/releases/tag/v0.1.0"><img src="https://img.shields.io/badge/Release-v0.1.0-008060.svg" alt="Release Tag"></a>
   <a href=".github/RULESETS.md"><img src="https://img.shields.io/badge/Main%20Branch-Protected%20Ruleset-success.svg" alt="Main Branch Ruleset"></a>
   <img src="https://img.shields.io/badge/CI%2FCD-Automated-blue.svg" alt="CI/CD Status">
@@ -42,9 +42,9 @@ Install the Second-Generation (2GP) Unlocked Package directly into your Salesfor
 
 | Environment                        | Direct 1-Click Installation Link                                                                                        | Package Version ID   |
 | :--------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :------------------- |
-| **Production / Developer Edition** | [👉 Install in Production / Dev Org](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG) | `04tg7000000WE31AAG` |
-| **Sandbox Environment**            | [👉 Install in Sandbox Org](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG)           | `04tg7000000WE31AAG` |
-| **Salesforce CLI (`sf`)**          | `sf package install --package 04tg7000000WE31AAG --target-org <ALIAS> --wait 20`                                        | `04tg7000000WE31AAG` |
+| **Production / Developer Edition** | [👉 Install in Production / Dev Org](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO) | `04tg7000000XZWrAAO` |
+| **Sandbox Environment**            | [👉 Install in Sandbox Org](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO)           | `04tg7000000XZWrAAO` |
+| **Salesforce CLI (`sf`)**          | `sf package install --package 04tg7000000XZWrAAO --target-org <ALIAS> --wait 20`                                        | `04tg7000000XZWrAAO` |
 
 ---
 
@@ -200,7 +200,7 @@ This repository strictly enforces open-source governance and release lifecycle s
   - [x] Community health suite: MIT License, Code of Conduct, Security Policy, Issue/PR templates.
 - [x] **Phase 3: 2GP Packaging &amp; Distribution**
   - [x] Second-Generation (2GP) Unlocked Package created: `ShopifySalesforceConnector` (`0Hog70000003qksCAA`).
-  - [x] Package version built: `04tg7000000WE31AAG` (`v0.1.0-1`).
+  - [x] Package version built: `04tg7000000XZWrAAO` (`v0.1.0-1`).
   - [x] Direct 1-Click Install URLs generated for Production and Sandbox.
 - [x] **Phase 4: Branding &amp; AppExchange Readiness**
   - [x] Complete 7-asset visual suite in `assets/` (App Icon 120x120, Hero Banner 16:9, 4 UI screenshots).

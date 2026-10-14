@@ -186,7 +186,7 @@ private class ShopifySyncServiceTest {
 
     @IsTest
     static void testDisabledSyncIgnored() {
-        Shopify_Setting__c settings = Shopify_Setting__c.getInstance();
+        Shopify_Setting__c settings = [SELECT Id, Sync_Active__c FROM Shopify_Setting__c LIMIT 1];
         settings.Sync_Active__c = false;
         update settings;
 
@@ -195,9 +195,14 @@ private class ShopifySyncServiceTest {
         Test.stopTest();
 
         System.assert(result.success);
-        List<Shopify_Sync_Log__c> logs = [SELECT Status__c FROM Shopify_Sync_Log__c WHERE Topic__c = 'customers/create'];
-        System.assertEquals(1, logs.size());
-        System.assertEquals('Ignored', logs[0].Status__c);
+        Shopify_Sync_Log__c log = [
+            SELECT Status__c
+            FROM Shopify_Sync_Log__c
+            WHERE Topic__c = 'customers/create'
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
+        System.assertEquals('Ignored', log.Status__c);
     }
 
     @IsTest

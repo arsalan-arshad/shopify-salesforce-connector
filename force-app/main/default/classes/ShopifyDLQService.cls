@@ -29,7 +29,6 @@ public with sharing class ShopifyDLQService {
             SELECT Id, Topic__c, Payload__c, Direction__c, Retry_Count__c, Status__c, Shopify_Record_Id__c, Salesforce_Record_Id__c
             FROM Shopify_Sync_Log__c
             WHERE Id = :logId
-            WITH USER_MODE
             LIMIT 1
         ];
 
@@ -60,11 +59,11 @@ public with sharing class ShopifyDLQService {
                 if (res.isSuccess) {
                     log.Status__c = 'Replayed';
                     log.Error_Message__c = null;
-                    update as user log;
+                    update log;
                     return new ReplayResult(true, logId, 'Outbound fulfillment successfully replayed.');
                 } else {
                     log.Error_Message__c = res.message;
-                    update as user log;
+                    update log;
                     return new ReplayResult(false, logId, 'Outbound replay failed: ' + res.message);
                 }
             } else {
@@ -74,17 +73,17 @@ public with sharing class ShopifyDLQService {
                     log.Status__c = 'Replayed';
                     log.Error_Message__c = null;
                     log.Salesforce_Record_Id__c = result.recordId;
-                    update as user log;
+                    update log;
                     return new ReplayResult(true, logId, 'Inbound webhook successfully reprocessed.');
                 } else {
                     log.Error_Message__c = result.errorMessage;
-                    update as user log;
+                    update log;
                     return new ReplayResult(false, logId, 'Replay failed: ' + result.errorMessage);
                 }
             }
         } catch (Exception ex) {
             log.Error_Message__c = 'Replay exception: ' + ex.getMessage();
-            update as user log;
+            update log;
             return new ReplayResult(false, logId, log.Error_Message__c);
         }
     }
@@ -99,7 +98,6 @@ public with sharing class ShopifyDLQService {
             SELECT Id
             FROM Shopify_Sync_Log__c
             WHERE Status__c = 'Failed'
-            WITH USER_MODE
             ORDER BY CreatedDate ASC
             LIMIT :batchLimit
         ];
@@ -138,13 +136,12 @@ public with sharing class ShopifyDLQService {
             SELECT Id
             FROM Shopify_Sync_Log__c
             WHERE CreatedDate < :cutoffDate
-            WITH USER_MODE
             LIMIT 5000
         ];
 
         Integer deletedCount = oldLogs.size();
         if (!oldLogs.isEmpty()) {
-            delete as user oldLogs;
+            delete oldLogs;
         }
         return deletedCount;
     }

@@ -33,11 +33,14 @@ public with sharing class ShopifySyncEngine {
         );
 
         // Check if sync is globally active
-        Shopify_Setting__c settings = Shopify_Setting__c.getInstance();
-        if (settings != null && settings.Id != null && !settings.Sync_Active__c) {
+        Shopify_Setting__c settings = Shopify_Setting__c.getOrgDefaults();
+        if (settings == null || settings.Id == null) {
+            settings = Shopify_Setting__c.getInstance();
+        }
+        if (settings != null && settings.Sync_Active__c == false) {
             log.Status__c = 'Ignored';
             log.Error_Message__c = 'Sync is currently disabled via Shopify_Setting__c.Sync_Active__c.';
-            insert as user log;
+            insert log;
             return new SyncResult(true, log.Id, null, log.Error_Message__c);
         }
 
@@ -61,7 +64,7 @@ public with sharing class ShopifySyncEngine {
                     log.Status__c = 'Ignored';
                     log.Error_Message__c = 'Unsupported webhook topic: ' + topic;
                     log.Execution_Time_Ms__c = System.currentTimeMillis() - startTime;
-                    insert as user log;
+                    insert log;
                     return new SyncResult(true, log.Id, null, log.Error_Message__c);
                 }
             } else {
@@ -71,7 +74,7 @@ public with sharing class ShopifySyncEngine {
             log.Status__c = 'Success';
             log.Salesforce_Record_Id__c = processedRecordId;
             log.Execution_Time_Ms__c = System.currentTimeMillis() - startTime;
-            insert as user log;
+            insert log;
 
             return new SyncResult(true, log.Id, processedRecordId, null);
 
@@ -79,7 +82,7 @@ public with sharing class ShopifySyncEngine {
             log.Status__c = 'Failed';
             log.Error_Message__c = ex.getMessage() + '\n' + ex.getStackTraceString();
             log.Execution_Time_Ms__c = System.currentTimeMillis() - startTime;
-            insert as user log;
+            insert log;
 
             return new SyncResult(false, log.Id, null, log.Error_Message__c);
         }
@@ -140,7 +143,7 @@ public with sharing class ShopifySyncEngine {
             targetContact.MailingCountry = (String) defaultAddr.get('country');
         }
 
-        upsert as user targetContact;
+        upsert targetContact;
         return targetContact.Id;
     }
 
@@ -164,7 +167,7 @@ public with sharing class ShopifySyncEngine {
 
         if (customerData != null) {
             contactId = processCustomer(customerData);
-            Contact c = [SELECT Id, AccountId FROM Contact WHERE Id = :contactId WITH USER_MODE LIMIT 1];
+            Contact c = [SELECT Id, AccountId FROM Contact WHERE Id = :contactId LIMIT 1];
             accountId = c.AccountId;
         } else {
             // Guest checkout: create or resolve Guest Account
@@ -180,7 +183,6 @@ public with sharing class ShopifySyncEngine {
             SELECT Id, Status, Shopify_Order_Id__c
             FROM Order
             WHERE Shopify_Order_Id__c = :shopifyOrderId
-            WITH USER_MODE
             LIMIT 1
         ];
 
@@ -201,7 +203,7 @@ public with sharing class ShopifySyncEngine {
         targetOrder.Shopify_Financial_Status__c = financialStatus;
         targetOrder.Shopify_Fulfillment_Status__c = String.isNotBlank(fulfillmentStatus) ? fulfillmentStatus : 'unfulfilled';
 
-        upsert as user targetOrder;
+        upsert targetOrder;
 
         // Optionally create/update Opportunity
         Shopify_Setting__c settings = Shopify_Setting__c.getInstance();
@@ -247,7 +249,6 @@ public with sharing class ShopifySyncEngine {
                 SELECT Id, Shopify_Checkout_Id__c, Status
                 FROM Lead
                 WHERE Shopify_Checkout_Id__c = :checkoutId
-                WITH USER_MODE
                 LIMIT 1
             ];
 
@@ -277,7 +278,7 @@ public with sharing class ShopifySyncEngine {
             targetLead.Shopify_Cart_Url__c = cartUrl;
             targetLead.Shopify_Abandoned_Items__c = itemsSummary;
 
-            upsert as user targetLead;
+            upsert targetLead;
 
             // Spawn high-priority follow-up Task if newly created or high-value cart
             createAbandonedCartTask(targetLead.Id, cartValue, cartUrl);
@@ -302,7 +303,7 @@ public with sharing class ShopifySyncEngine {
                           '. Reach out immediately via email or phone to offer assistance or a recovery discount.\n\nDirect Cart Link: ' + 
                           (String.isNotBlank(cartUrl) ? cartUrl : 'N/A')
         );
-        insert as user followUpTask;
+        insert followUpTask;
     }
 
     /**
@@ -313,7 +314,6 @@ public with sharing class ShopifySyncEngine {
             SELECT Id, StageName, Amount
             FROM Opportunity
             WHERE Name = :('Shopify Order ' + orderNumber) AND AccountId = :accountId
-            WITH USER_MODE
             LIMIT 1
         ];
 
@@ -330,7 +330,7 @@ public with sharing class ShopifySyncEngine {
         }
 
         opp.Amount = amount;
-        upsert as user opp;
+        upsert opp;
     }
 
     /**
@@ -342,7 +342,6 @@ public with sharing class ShopifySyncEngine {
                 SELECT Id, AccountId, Shopify_Customer_Id__c, Email, Phone
                 FROM Contact
                 WHERE Shopify_Customer_Id__c = :shopifyId
-                WITH USER_MODE
                 LIMIT 1
             ];
             if (!byShopifyId.isEmpty()) return byShopifyId[0];
@@ -353,7 +352,6 @@ public with sharing class ShopifySyncEngine {
                 SELECT Id, AccountId, Shopify_Customer_Id__c, Email, Phone
                 FROM Contact
                 WHERE Email = :email
-                WITH USER_MODE
                 LIMIT 1
             ];
             if (!byEmail.isEmpty()) return byEmail[0];
@@ -364,7 +362,6 @@ public with sharing class ShopifySyncEngine {
                 SELECT Id, AccountId, Shopify_Customer_Id__c, Email, Phone
                 FROM Contact
                 WHERE Phone = :phone
-                WITH USER_MODE
                 LIMIT 1
             ];
             if (!byPhone.isEmpty()) return byPhone[0];
@@ -382,7 +379,6 @@ public with sharing class ShopifySyncEngine {
             SELECT Id, Name
             FROM Account
             WHERE Name = :accountName
-            WITH USER_MODE
             LIMIT 1
         ];
 
@@ -391,7 +387,7 @@ public with sharing class ShopifySyncEngine {
         }
 
         Account newAcct = new Account(Name = accountName);
-        insert as user newAcct;
+        insert newAcct;
         return newAcct;
     }
 

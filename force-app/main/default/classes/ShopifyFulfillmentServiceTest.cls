@@ -72,7 +72,7 @@ private class ShopifyFulfillmentServiceTest {
 
     @IsTest
     static void testDisabledBidirectionalSync() {
-        Shopify_Setting__c settings = Shopify_Setting__c.getInstance();
+        Shopify_Setting__c settings = [SELECT Id, Enable_Bidirectional_Fulfillment__c FROM Shopify_Setting__c LIMIT 1];
         settings.Enable_Bidirectional_Fulfillment__c = false;
         update settings;
 

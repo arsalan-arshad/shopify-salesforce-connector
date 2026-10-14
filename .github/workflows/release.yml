@@ -46,9 +46,9 @@ jobs:
             ## 🚀 Universal Shopify ↔ Salesforce Connector `${{ steps.vars.outputs.tag }}`
 
             ### 📦 2GP Package Installation Links
-            - **Production / Developer Edition:** [Install in Production](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG)
-            - **Sandbox:** [Install in Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG)
-            - **Package ID:** `04tg7000000WE31AAG`
+            - **Production / Developer Edition:** [Install in Production](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO)
+            - **Sandbox:** [Install in Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000XZWrAAO)
+            - **Package ID:** `04tg7000000XZWrAAO`
 
             ### ⚡ What's New in This Release
             - **Zero Per-Task Pricing:** 100% open-source integration running on webhooks without middleware fees.

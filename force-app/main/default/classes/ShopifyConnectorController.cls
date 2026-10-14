@@ -54,7 +54,7 @@ public with sharing class ShopifyConnectorController {
             settings.Sync_Active__c = (Boolean) config.get('syncActive');
         }
 
-        upsert as user settings;
+        upsert settings;
         return true;
     }
 
@@ -66,28 +66,24 @@ public with sharing class ShopifyConnectorController {
             SELECT COUNT()
             FROM Shopify_Sync_Log__c
             WHERE CreatedDate >= :last24Hours
-            WITH USER_MODE
         ];
 
         Integer success24h = [
             SELECT COUNT()
             FROM Shopify_Sync_Log__c
             WHERE CreatedDate >= :last24Hours AND Status__c IN ('Success', 'Replayed')
-            WITH USER_MODE
         ];
 
         Integer failed24h = [
             SELECT COUNT()
             FROM Shopify_Sync_Log__c
             WHERE CreatedDate >= :last24Hours AND Status__c = 'Failed'
-            WITH USER_MODE
         ];
 
         Integer totalPending = [
             SELECT COUNT()
             FROM Shopify_Sync_Log__c
             WHERE Status__c = 'Failed'
-            WITH USER_MODE
         ];
 
         Decimal successRate = total24h > 0 ? ((Decimal) success24h / (Decimal) total24h) * 100.0 : 100.0;
@@ -111,7 +107,6 @@ public with sharing class ShopifyConnectorController {
                        Direction__c, Execution_Time_Ms__c, Retry_Count__c, Error_Message__c, CreatedDate
                 FROM Shopify_Sync_Log__c
                 WHERE Status__c = :statusFilter
-                WITH USER_MODE
                 ORDER BY CreatedDate DESC
                 LIMIT :queryLimit
             ];
@@ -121,7 +116,6 @@ public with sharing class ShopifyConnectorController {
             SELECT Id, Name, Topic__c, Status__c, Shopify_Record_Id__c, Salesforce_Record_Id__c,
                    Direction__c, Execution_Time_Ms__c, Retry_Count__c, Error_Message__c, CreatedDate
             FROM Shopify_Sync_Log__c
-            WITH USER_MODE
             ORDER BY CreatedDate DESC
             LIMIT :queryLimit
         ];
