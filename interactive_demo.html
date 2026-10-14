@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universal Shopify ↔ Salesforce Connector - Interactive Simulation &amp; Live Demo</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/design-system/2.22.1/styles/salesforce-lightning-design-system.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --slds-c-card-radius-border: 12px;
+        --shopify-green: #008060;
+        --shopify-dark: #004c3f;
+        --salesforce-blue: #0176d3;
+        --salesforce-dark: #014486;
+      }
+
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        background: #f8fafc;
+        color: #1e293b;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+
+      .header-gradient {
+        background: linear-gradient(135deg, #004c3f 0%, #008060 40%, #0176d3 80%, #014486 100%);
+        color: #ffffff;
+        padding: 32px 24px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .header-title {
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .header-subtitle {
+        font-size: 1rem;
+        color: #e2e8f0;
+        margin: 0;
+        max-width: 800px;
+      }
+
+      .pill-tag {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .nav-toolbar {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+
+      .nav-btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn.active {
+        background: #0176d3;
+        color: #ffffff;
+        border-color: #0176d3;
+        box-shadow: 0 2px 8px rgba(1, 118, 211, 0.25);
+      }
+
+      .main-container {
+        max-width: 1360px;
+        margin: 24px auto;
+        padding: 0 24px;
+      }
+
+      .metric-card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        transition: transform 0.2s;
+      }
+
+      .metric-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .metric-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: #64748b;
+      }
+
+      .metric-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 6px 0;
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .badge-success {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .badge-failed {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .badge-replayed {
+        background: #e0e7ff;
+        color: #4338ca;
+      }
+
+      .simulation-console {
+        background: #0f172a;
+        color: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      }
+
+      .console-line {
+        line-height: 1.6;
+      }
+
+      .console-ts {
+        color: #64748b;
+      }
+      .console-topic {
+        color: #38bdf8;
+        font-weight: 600;
+      }
+      .console-success {
+        color: #4ade80;
+      }
+      .console-warn {
+        color: #fbbf24;
+      }
+      .console-err {
+        color: #f87171;
+      }
+
+      .crm-record-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+      }
+
+      .crm-field-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+      }
+
+      .crm-field-val {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Brand Header -->
+    <header class="header-gradient">
+      <div style="max-width: 1360px; margin: 0 auto">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start">
+          <div>
+            <div style="display: flex; gap: 8px; margin-bottom: 8px">
+              <span class="pill-tag">⚡ 100% Free Open-Source (MIT)</span>
+              <span class="pill-tag">🛡️ HMAC-SHA256 Verified</span>
+              <span class="pill-tag">📦 2GP Unlocked Package</span>
+            </div>
+            <h1 class="header-title">
+              <span>🛍️ Shopify</span>
+              <span>↔</span>
+              <span>☁️ Salesforce</span>
+              <span style="font-size: 1.25rem; font-weight: 600; opacity: 0.9">Universal Integration Bridge</span>
+            </h1>
+            <p class="header-subtitle">
+              High-performance horizontal connector replacing $10,000/yr middleware fees with zero-friction real-time
+              sync for customers, orders, high-value abandoned cart recovery leads, and outbound fulfillment tracking.
+            </p>
+          </div>
+          <div style="text-align: right">
+            <a
+              href="https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG"
+              target="_blank"
+              class="nav-btn"
+              style="
+                background: #ffffff;
+                color: #008060;
+                font-weight: 700;
+                border: none;
+                padding: 10px 20px;
+                font-size: 0.95rem;
+                text-decoration: none;
+              "
+            >
+              🚀 1-Click Install in Salesforce
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Interactive View Navigation -->
+    <nav class="nav-toolbar">
+      <div style="display: flex; gap: 12px">
+        <button class="nav-btn active" id="btn-view-setup" onclick="switchView('setup')">
+          ⚙️ Setup &amp; DLQ Dashboard
+        </button>
+        <button class="nav-btn" id="btn-view-lead" onclick="switchView('lead')">🚨 High-Value Cart Lead ($450)</button>
+        <button class="nav-btn" id="btn-view-order" onclick="switchView('order')">🛍️ Order &amp; Customer Sync</button>
+        <button class="nav-btn" id="btn-view-fulfillment" onclick="switchView('fulfillment')">
+          🚚 Outbound Fulfillment Push
+        </button>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center">
+        <span style="font-size: 0.8rem; color: #64748b">Live Simulator:</span>
+        <button
+          class="nav-btn"
+          style="background: #008060; color: #ffffff; border: none"
+          onclick="triggerLiveWebhook()"
+        >
+          ⚡ Send Sample Webhook
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-container">
+      <!-- 1. VIEW: SETUP & DLQ DASHBOARD -->
+      <section id="view-setup">
+        <!-- Metrics Row -->
+        <div class="slds-grid slds-gutters slds-var-m-bottom_medium">
+          <div class="slds-col slds-size_3-of-12">
+            <div class="metric-card" style="border-left: 4px solid #0176d3">
+              <div class="metric-label">24h Transactions</div>
+              <div class="metric-value" id="stat-total">1,248</div>
+              <div style="font-size: 0.75rem; color: #64748b">Inbound &amp; Outbound Webhooks</div>
+            </div>
+          </div>
+          <div class="slds-col slds-size_3-of-12">
+            <div class="metric-card" style="border-left: 4px solid #16a34a">
+              <div class="metric-label">24h Success Rate</div>
+              <div class="metric-value" style="color: #16a34a" id="stat-rate">99.8%</div>
+              <div style="font-size: 0.75rem; color: #64748b">1,245 Successful Deliveries</div>
+            </div>
+          </div>
+          <div class="slds-col slds-size_3-of-12">
+            <div class="metric-card" style="border-left: 4px solid #dc2626">
+              <div class="metric-label">Dead-Letter Queue (DLQ)</div>
+              <div class="metric-value" style="color: #dc2626" id="stat-dlq">3</div>
+              <div style="font-size: 0.75rem; color: #64748b">Failed Events Ready for Replay</div>
+            </div>
+          </div>
+          <div class="slds-col slds-size_3-of-12">
+            <div class="metric-card" style="border-left: 4px solid #008060">
+              <div class="metric-label">Shopify Store Link</div>
+              <div class="metric-value" style="font-size: 1.4rem; color: #008060">Connected</div>
+              <div style="font-size: 0.75rem; color: #64748b">apex-gear.myshopify.com</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dead Letter Queue Datatable Card -->
+        <div class="crm-record-card slds-var-m-bottom_large">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px">
+            <div>
+              <h2 style="font-size: 1.15rem; font-weight: 700; margin: 0">
+                Dead-Letter Queue (DLQ) &amp; Webhook Audit Log
+              </h2>
+              <p style="font-size: 0.8rem; color: #64748b; margin: 4px 0 0">
+                Stored webhook events in custom object <code class="font-mono">Shopify_Sync_Log__c</code> with zero data
+                loss replay.
+              </p>
+            </div>
+            <div>
+              <button class="nav-btn" style="background: #dc2626; color: white; border: none" onclick="replayAllDLQ()">
+                🔄 1-Click Replay All DLQ (3)
+              </button>
+            </div>
+          </div>
+
+          <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+              <tr class="slds-line-height_reset" style="background: #f8fafc">
+                <th>Log #</th>
+                <th>Topic</th>
+                <th>Status</th>
+                <th>Direction</th>
+                <th>Shopify ID</th>
+                <th>Latency</th>
+                <th>Created</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="dlq-table-body">
+              <tr id="row-dlq-1">
+                <td class="font-mono">LOG-000412</td>
+                <td class="font-mono">orders/create</td>
+                <td><span class="status-badge badge-failed" id="badge-1">Failed</span></td>
+                <td>Inbound ↙</td>
+                <td class="font-mono">8829104112</td>
+                <td>42 ms</td>
+                <td>10 mins ago</td>
+                <td>
+                  <button
+                    class="nav-btn"
+                    style="padding: 4px 8px; font-size: 0.75rem"
+                    onclick="replaySingleRow('row-dlq-1', 'badge-1')"
+                  >
+                    Replay ↺
+                  </button>
+                </td>
+              </tr>
+              <tr id="row-dlq-2">
+                <td class="font-mono">LOG-000411</td>
+                <td class="font-mono">fulfillments/create</td>
+                <td><span class="status-badge badge-failed" id="badge-2">Failed</span></td>
+                <td>Outbound ↗</td>
+                <td class="font-mono">8829091884</td>
+                <td>120 ms</td>
+                <td>25 mins ago</td>
+                <td>
+                  <button
+                    class="nav-btn"
+                    style="padding: 4px 8px; font-size: 0.75rem"
+                    onclick="replaySingleRow('row-dlq-2', 'badge-2')"
+                  >
+                    Replay ↺
+                  </button>
+                </td>
+              </tr>
+              <tr id="row-dlq-3">
+                <td class="font-mono">LOG-000410</td>
+                <td class="font-mono">checkouts/create</td>
+                <td><span class="status-badge badge-failed" id="badge-3">Failed</span></td>
+                <td>Inbound ↙</td>
+                <td class="font-mono">chk_token_7721</td>
+                <td>31 ms</td>
+                <td>1 hour ago</td>
+                <td>
+                  <button
+                    class="nav-btn"
+                    style="padding: 4px 8px; font-size: 0.75rem"
+                    onclick="replaySingleRow('row-dlq-3', 'badge-3')"
+                  >
+                    Replay ↺
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td class="font-mono">LOG-000409</td>
+                <td class="font-mono">customers/update</td>
+                <td><span class="status-badge badge-success">Success</span></td>
+                <td>Inbound ↙</td>
+                <td class="font-mono">770192841</td>
+                <td>18 ms</td>
+                <td>1.5 hours ago</td>
+                <td><span style="font-size: 0.75rem; color: #16a34a">✔ Completed</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Live Streaming Console -->
+        <div class="simulation-console">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              border-bottom: 1px solid #334155;
+              padding-bottom: 8px;
+              margin-bottom: 12px;
+            "
+          >
+            <span style="font-weight: 700; color: #38bdf8">⚡ Live Webhook Event Stream (HMAC Verified)</span>
+            <span style="color: #64748b">Endpoint: /services/apexrest/shopify/v1/webhook</span>
+          </div>
+          <div id="console-stream">
+            <div class="console-line">
+              <span class="console-ts">[03:30:12.411]</span> <span class="console-topic">POST /webhook</span> | Topic:
+              <span style="color: #a78bfa">orders/paid</span> | HMAC:
+              <span class="console-success">VERIFIED (SHA-256)</span> | Target: Order #1042 ($349.99) $\rightarrow$
+              Contact Sarah Connor
+            </div>
+            <div class="console-line">
+              <span class="console-ts">[03:30:12.434]</span> <span class="console-topic">DML INSERT</span> | Created
+              <code style="color: #fbcfe8">Order (Id: 801g7000000A1BC)</code> &amp;
+              <code style="color: #fbcfe8">Opportunity ($349.99)</code> in 23ms
+            </div>
+            <div class="console-line">
+              <span class="console-ts">[03:30:18.891]</span> <span class="console-topic">POST /webhook</span> | Topic:
+              <span style="color: #a78bfa">checkouts/create</span> | Total:
+              <span style="color: #f87171">$450.00 &gt; $200 threshold</span> | Action:
+              <span class="console-warn">Spawned High-Value Lead</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. VIEW: HIGH-VALUE CART LEAD -->
+      <section id="view-lead" style="display: none">
+        <div class="crm-record-card">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 16px;
+              margin-bottom: 20px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 16px">
+              <div
+                style="
+                  width: 48px;
+                  height: 48px;
+                  background: #ea580c;
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 1.5rem;
+                  color: white;
+                "
+              >
+                👤
+              </div>
+              <div>
+                <div style="font-size: 0.8rem; text-transform: uppercase; color: #64748b; font-weight: 700">
+                  Salesforce Lead &bull; High-Value Abandoned Cart
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin: 2px 0 0">Alex Rivers</h2>
+              </div>
+            </div>
+            <div>
+              <span
+                style="
+                  background: #ffedd5;
+                  color: #c2410c;
+                  padding: 6px 14px;
+                  border-radius: 9999px;
+                  font-weight: 700;
+                  font-size: 0.85rem;
+                "
+              >
+                🚨 Cart Value: $450.00 (Exceeds $200 Threshold)
+              </span>
+            </div>
+          </div>
+
+          <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_4-of-12">
+              <div class="crm-field-label">Lead Source</div>
+              <div class="crm-field-val">Shopify Abandoned Cart</div>
+
+              <div class="crm-field-label">Email</div>
+              <div class="crm-field-val">alex.rivers@example.com</div>
+
+              <div class="crm-field-label">Phone</div>
+              <div class="crm-field-val">+1 (555) 234-5678</div>
+
+              <div class="crm-field-label">Shopify Checkout Token</div>
+              <div class="crm-field-val font-mono">chk_token_882910</div>
+            </div>
+
+            <div class="slds-col slds-size_8-of-12">
+              <!-- High Priority Task Card -->
+              <div
+                style="
+                  background: #fff7ed;
+                  border-left: 4px solid #ea580c;
+                  border-radius: 8px;
+                  padding: 16px;
+                  margin-bottom: 16px;
+                "
+              >
+                <div style="display: flex; justify-content: space-between; align-items: center">
+                  <strong style="color: #9a3412">⚡ Automated Priority Task Created for Sales Rep</strong>
+                  <span
+                    style="
+                      background: #dc2626;
+                      color: white;
+                      padding: 2px 8px;
+                      border-radius: 4px;
+                      font-size: 0.7rem;
+                      font-weight: 700;
+                    "
+                    >HIGH PRIORITY</span
+                  >
+                </div>
+                <p style="margin: 8px 0 0; font-size: 0.9rem; color: #431407">
+                  <strong>Subject:</strong> Urgent: Shopify High-Value Cart Recovery ($450.00)<br />
+                  <strong>Due Date:</strong> Today &bull; <strong>Status:</strong> Not Started &bull;
+                  <strong>Assigned:</strong> Active Sales Rep
+                </p>
+              </div>
+
+              <!-- Abandoned Items Box -->
+              <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 16px">
+                <div class="crm-field-label">Abandoned Products Left in Cart</div>
+                <div style="margin-top: 8px; font-size: 0.9rem; line-height: 1.6">
+                  <div>• <strong>Apex Thermal Winter Parka</strong> (Qty: 1, Price: $299.00, SKU: PRK-BLK-L)</div>
+                  <div>• <strong>Merino Wool Trail Cap</strong> (Qty: 2, Price: $75.50, SKU: CAP-GRY)</div>
+                </div>
+                <div style="margin-top: 14px">
+                  <a
+                    href="#"
+                    onclick="
+                      alert('Opening customer cart checkout recovery link in Shopify...');
+                      return false;
+                    "
+                    class="nav-btn"
+                    style="background: #008060; color: white; border: none; display: inline-flex"
+                  >
+                    ↗ 1-Click Customer Cart Recovery Link
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. VIEW: ORDER & CUSTOMER SYNC -->
+      <section id="view-order" style="display: none">
+        <div class="crm-record-card">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 16px;
+              margin-bottom: 20px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 16px">
+              <div
+                style="
+                  width: 48px;
+                  height: 48px;
+                  background: #008060;
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 1.5rem;
+                  color: white;
+                "
+              >
+                🛍️
+              </div>
+              <div>
+                <div style="font-size: 0.8rem; text-transform: uppercase; color: #64748b; font-weight: 700">
+                  Salesforce Order #1042 &bull; Synced from Shopify
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin: 2px 0 0">$349.99 USD</h2>
+              </div>
+            </div>
+            <div>
+              <span
+                style="
+                  background: #dcfce7;
+                  color: #15803d;
+                  padding: 6px 14px;
+                  border-radius: 9999px;
+                  font-weight: 700;
+                  font-size: 0.85rem;
+                "
+              >
+                ✔ Paid &bull; Draft Order Created
+              </span>
+            </div>
+          </div>
+
+          <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_6-of-12">
+              <div class="crm-field-label">Account &bull; Customer Deduplication</div>
+              <div class="crm-field-val">Sarah Connor Household</div>
+
+              <div class="crm-field-label">Contact Email &amp; Phone</div>
+              <div class="crm-field-val">sarah.connor@example.com &bull; +1 (555) 123-4567</div>
+
+              <div class="crm-field-label">Customer Lifetime Spend</div>
+              <div class="crm-field-val" style="color: #16a34a">$1,890.00 (9 Total Orders)</div>
+
+              <div class="crm-field-label">Shopify Customer Tags</div>
+              <div class="crm-field-val">
+                <span class="status-badge" style="background: #e0f2fe; color: #0369a1">VIP</span>
+                <span class="status-badge" style="background: #fef3c7; color: #92400e">Wholesale</span>
+              </div>
+            </div>
+
+            <div class="slds-col slds-size_6-of-12">
+              <div class="crm-field-label">Auto-Generated Salesforce Opportunity</div>
+              <div class="crm-field-val" style="color: #0176d3">Shopify Order #1042 ($349.99) &bull; Closed Won</div>
+
+              <div class="crm-field-label">Shipping Address</div>
+              <div class="crm-field-val">123 Cyberdyne Way, Los Angeles, CA 90001, US</div>
+
+              <div class="crm-field-label">Shopify Order ID (External Unique Key)</div>
+              <div class="crm-field-val font-mono">8209829119461</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. VIEW: OUTBOUND FULFILLMENT PUSH -->
+      <section id="view-fulfillment" style="display: none">
+        <div class="crm-record-card">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              border-bottom: 2px solid #e2e8f0;
+              padding-bottom: 16px;
+              margin-bottom: 20px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 16px">
+              <div
+                style="
+                  width: 48px;
+                  height: 48px;
+                  background: #0176d3;
+                  border-radius: 8px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 1.5rem;
+                  color: white;
+                "
+              >
+                🚚
+              </div>
+              <div>
+                <div style="font-size: 0.8rem; text-transform: uppercase; color: #64748b; font-weight: 700">
+                  Bi-directional Outbound Synchronization
+                </div>
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin: 2px 0 0">Push Fulfillment to Shopify</h2>
+              </div>
+            </div>
+            <div>
+              <span
+                style="
+                  background: #e0f2fe;
+                  color: #0284c7;
+                  padding: 6px 14px;
+                  border-radius: 9999px;
+                  font-weight: 700;
+                  font-size: 0.85rem;
+                "
+              >
+                🔄 Salesforce $\rightarrow$ Shopify REST API
+              </span>
+            </div>
+          </div>
+
+          <div class="slds-grid slds-wrap slds-gutters">
+            <div class="slds-col slds-size_5-of-12">
+              <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px"
+                >Tracking Number:</label
+              >
+              <input
+                type="text"
+                id="track-num-input"
+                value="1Z9999999999999999"
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  border: 1px solid #cbd5e1;
+                  border-radius: 6px;
+                  font-family: 'JetBrains Mono', monospace;
+                  font-size: 0.9rem;
+                  margin-bottom: 16px;
+                "
+              />
+
+              <label style="font-weight: 700; font-size: 0.85rem; display: block; margin-bottom: 4px"
+                >Carrier Name:</label
+              >
+              <select
+                id="carrier-input"
+                style="
+                  width: 100%;
+                  padding: 10px;
+                  border: 1px solid #cbd5e1;
+                  border-radius: 6px;
+                  font-size: 0.9rem;
+                  margin-bottom: 16px;
+                "
+              >
+                <option value="UPS">UPS</option>
+                <option value="FedEx">FedEx</option>
+                <option value="USPS">USPS</option>
+                <option value="DHL">DHL Express</option>
+              </select>
+
+              <button
+                class="nav-btn"
+                style="
+                  background: #0176d3;
+                  color: white;
+                  border: none;
+                  width: 100%;
+                  justify-content: center;
+                  padding: 12px;
+                  font-size: 0.95rem;
+                "
+                onclick="simulateFulfillmentPush()"
+              >
+                🚀 Push Tracking to Shopify
+              </button>
+            </div>
+
+            <div class="slds-col slds-size_7-of-12">
+              <div class="simulation-console" style="height: 100%">
+                <div style="color: #38bdf8; font-weight: 700; margin-bottom: 8px">
+                  📡 Outbound API Request &amp; Response
+                </div>
+                <div id="fulfillment-api-log">
+                  <div class="console-line">
+                    <span class="console-ts">[Ready]</span> Click "Push Tracking to Shopify" to simulate the outbound
+                    API transaction...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function switchView(viewName) {
+        document.getElementById('view-setup').style.display = 'none';
+        document.getElementById('view-lead').style.display = 'none';
+        document.getElementById('view-order').style.display = 'none';
+        document.getElementById('view-fulfillment').style.display = 'none';
+
+        document.getElementById('btn-view-setup').classList.remove('active');
+        document.getElementById('btn-view-lead').classList.remove('active');
+        document.getElementById('btn-view-order').classList.remove('active');
+        document.getElementById('btn-view-fulfillment').classList.remove('active');
+
+        document.getElementById('view-' + viewName).style.display = 'block';
+        document.getElementById('btn-view-' + viewName).classList.add('active');
+      }
+
+      function replaySingleRow(rowId, badgeId) {
+        const badge = document.getElementById(badgeId);
+        badge.className = 'status-badge badge-replayed';
+        badge.innerText = 'Replayed';
+
+        const stream = document.getElementById('console-stream');
+        const now = new Date().toLocaleTimeString();
+        stream.innerHTML += `<div class="console-line"><span class="console-ts">[${now}]</span> <span class="console-topic">DLQ REPLAY</span> | Row ${rowId} reprocessed | Status: <span class="console-success">SUCCESS</span></div>`;
+
+        const dlqStat = document.getElementById('stat-dlq');
+        let count = parseInt(dlqStat.innerText) || 3;
+        if (count > 0) dlqStat.innerText = count - 1;
+      }
+
+      function replayAllDLQ() {
+        replaySingleRow('row-dlq-1', 'badge-1');
+        replaySingleRow('row-dlq-2', 'badge-2');
+        replaySingleRow('row-dlq-3', 'badge-3');
+        alert('✔ All 3 Dead-Letter Queue items have been replayed and recovered into Salesforce!');
+      }
+
+      function triggerLiveWebhook() {
+        const stream = document.getElementById('console-stream');
+        const now = new Date().toLocaleTimeString();
+        const topics = ['orders/paid', 'checkouts/create', 'customers/update'];
+        const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+
+        stream.innerHTML += `<div class="console-line"><span class="console-ts">[${now}]</span> <span class="console-topic">POST /webhook</span> | Topic: <span style="color:#a78bfa;">${randomTopic}</span> | HMAC: <span class="console-success">VERIFIED</span> | Latency: 21ms</div>`;
+
+        const totalStat = document.getElementById('stat-total');
+        totalStat.innerText = (parseInt(totalStat.innerText.replace(',', '')) + 1).toLocaleString();
+      }
+
+      function simulateFulfillmentPush() {
+        const tracking = document.getElementById('track-num-input').value;
+        const carrier = document.getElementById('carrier-input').value;
+        const logBox = document.getElementById('fulfillment-api-log');
+        const now = new Date().toLocaleTimeString();
+
+        logBox.innerHTML = `
+                <div class="console-line"><span class="console-ts">[${now}]</span> <span class="console-topic">POST</span> https://apex-gear.myshopify.com/admin/api/2024-01/orders/88219/fulfillments.json</div>
+                <div class="console-line"><span class="console-ts">[Headers]</span> X-Shopify-Access-Token: shpat_••••••••••</div>
+                <div class="console-line"><span class="console-ts">[Payload]</span> {"fulfillment": {"tracking_info": {"number": "${tracking}", "company": "${carrier}"}}}</div>
+                <div class="console-line"><span class="console-ts">[Response]</span> <span class="console-success">HTTP 201 Created</span> (118 ms)</div>
+                <div class="console-line"><span class="console-ts">[Log]</span> Stored in <code style="color:#fbcfe8;">Shopify_Sync_Log__c</code> (Direction: Outbound_To_Shopify, Status: Success)</div>
+            `;
+      }
+
+      // Support URL parameter for automated screenshot views (?view=lead, ?view=order, etc.)
+      const urlParams = new URLSearchParams(window.location.search);
+      const requestedView = urlParams.get('view');
+      if (requestedView) {
+        switchView(requestedView);
+      }
+    </script>
+  </body>
+</html>
