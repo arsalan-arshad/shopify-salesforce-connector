@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Direction__c</fullName>
+    <deprecated>false</deprecated>
+    <description>Direction of the sync transaction: Inbound from Shopify or Outbound to Shopify.</description>
+    <externalId>false</externalId>
+    <label>Direction</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Inbound_From_Shopify</fullName>
+                <default>true</default>
+                <label>Inbound (Shopify → Salesforce)</label>
+            </value>
+            <value>
+                <fullName>Outbound_To_Shopify</fullName>
+                <default>false</default>
+                <label>Outbound (Salesforce → Shopify)</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

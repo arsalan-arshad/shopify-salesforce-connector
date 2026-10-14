@@ -1,0 +1,259 @@
+<template>
+    <lightning-card title="Universal Shopify ↔ Salesforce Connector" icon-name="custom:custom68">
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button label="Refresh" icon-name="utility:refresh" onclick={handleRefresh}></lightning-button>
+                <lightning-button label="Save Settings" variant="brand" icon-name="utility:save" onclick={handleSaveSettings} disabled={isSaving}></lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-var-p-around_medium">
+            <!-- Health Metric Cards -->
+            <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <div class="metric-card metric-blue">
+                        <div class="metric-label">24h Transactions</div>
+                        <div class="metric-value">{stats.total24h}</div>
+                        <div class="metric-subtext">Inbound & Outbound</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <div class="metric-card metric-green">
+                        <div class="metric-label">24h Success Rate</div>
+                        <div class="metric-value">{stats.successRate}%</div>
+                        <div class="metric-subtext">{stats.success24h} Successful Events</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <div class="metric-card metric-red">
+                        <div class="metric-label">Dead-Letter Queue (DLQ)</div>
+                        <div class="metric-value">{stats.totalPendingDlq}</div>
+                        <div class="metric-subtext">Failed Events Pending Replay</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <div class="metric-card metric-purple">
+                        <div class="metric-label">Sync Status</div>
+                        <div class="metric-value">
+                            <span class={syncStatusBadgeClass}>{syncStatusLabel}</span>
+                        </div>
+                        <div class="metric-subtext">{shopDomainDisplay}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabbed Navigation -->
+            <lightning-tabset active-tab-value="dlq">
+                <!-- Tab 1: DLQ & Logs -->
+                <lightning-tab label="Dead-Letter Queue & Logs" value="dlq" icon-name="utility:matrix">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+                        <div class="slds-col slds-grow">
+                            <div class="slds-grid slds-gutters_small">
+                                <div class="slds-col slds-size_1-of-3">
+                                    <lightning-combobox
+                                        name="statusFilter"
+                                        label="Filter Status"
+                                        value={statusFilter}
+                                        options={filterOptions}
+                                        onchange={handleFilterChange}
+                                        variant="label-hidden">
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-col slds-no-flex">
+                            <lightning-button
+                                label="Replay All Failed DLQ"
+                                variant="destructive-text"
+                                icon-name="utility:redo"
+                                onclick={handleBulkReplay}
+                                disabled={isReplaying}>
+                            </lightning-button>
+                        </div>
+                    </div>
+
+                    <template lwc:if={hasLogs}>
+                        <div class="table-container slds-border_top slds-border_bottom">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col"><div class="slds-truncate">Log #</div></th>
+                                        <th scope="col"><div class="slds-truncate">Topic</div></th>
+                                        <th scope="col"><div class="slds-truncate">Status</div></th>
+                                        <th scope="col"><div class="slds-truncate">Direction</div></th>
+                                        <th scope="col"><div class="slds-truncate">Shopify Record</div></th>
+                                        <th scope="col"><div class="slds-truncate">Retries</div></th>
+                                        <th scope="col"><div class="slds-truncate">Latency</div></th>
+                                        <th scope="col"><div class="slds-truncate">Created</div></th>
+                                        <th scope="col"><div class="slds-truncate">Action</div></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={formattedLogs} for:item="log">
+                                        <tr key={log.Id}>
+                                            <td><div class="slds-truncate font-mono">{log.Name}</div></td>
+                                            <td><div class="slds-truncate font-mono">{log.Topic__c}</div></td>
+                                            <td>
+                                                <span class={log.badgeClass}>{log.Status__c}</span>
+                                            </td>
+                                            <td><div class="slds-truncate">{log.directionFormatted}</div></td>
+                                            <td><div class="slds-truncate font-mono">{log.Shopify_Record_Id__c}</div></td>
+                                            <td><div class="slds-truncate">{log.Retry_Count__c}</div></td>
+                                            <td><div class="slds-truncate">{log.Execution_Time_Ms__c} ms</div></td>
+                                            <td><div class="slds-truncate">{log.createdFormatted}</div></td>
+                                            <td>
+                                                <lightning-button-icon
+                                                    icon-name="utility:redo"
+                                                    alternative-text="Replay Log"
+                                                    title="Replay from Stored Payload"
+                                                    data-id={log.Id}
+                                                    onclick={handleReplaySingle}
+                                                    disabled={isReplaying}>
+                                                </lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <div class="slds-illustration slds-illustration_small slds-var-p-around_large">
+                            <div class="slds-text-heading_medium slds-text-color_weak">No sync logs match your filter.</div>
+                        </div>
+                    </template>
+                </lightning-tab>
+
+                <!-- Tab 2: Settings & Credentials -->
+                <lightning-tab label="Store & Webhook Settings" value="settings" icon-name="utility:settings">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                            <h3 class="section-title">Shopify Store Credentials</h3>
+                            <lightning-input
+                                label="Shop Domain"
+                                value={form.shopDomain}
+                                placeholder="your-store.myshopify.com"
+                                data-field="shopDomain"
+                                onchange={handleInputChange}>
+                            </lightning-input>
+
+                            <lightning-input
+                                type="password"
+                                label="Webhook Shared Secret"
+                                placeholder={sharedSecretPlaceholder}
+                                data-field="sharedSecret"
+                                onchange={handleInputChange}>
+                            </lightning-input>
+
+                            <lightning-input
+                                type="password"
+                                label="Shopify Admin API Access Token"
+                                placeholder={adminTokenPlaceholder}
+                                data-field="adminAccessToken"
+                                onchange={handleInputChange}>
+                            </lightning-input>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12">
+                            <h3 class="section-title">Sync Logic & Thresholds</h3>
+                            <lightning-input
+                                type="number"
+                                label="High-Value Abandoned Cart Threshold ($)"
+                                value={form.abandonedCartThreshold}
+                                formatter="currency"
+                                step="10.00"
+                                data-field="abandonedCartThreshold"
+                                onchange={handleInputChange}>
+                            </lightning-input>
+
+                            <div class="slds-var-m-top_medium">
+                                <lightning-input
+                                    type="toggle"
+                                    label="Auto-Create Opportunity for Orders"
+                                    checked={form.autoCreateOpportunity}
+                                    data-field="autoCreateOpportunity"
+                                    onchange={handleToggleChange}>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-var-m-top_medium">
+                                <lightning-input
+                                    type="toggle"
+                                    label="Enable Bidirectional Fulfillment Push"
+                                    checked={form.enableBidirectionalFulfillment}
+                                    data-field="enableBidirectionalFulfillment"
+                                    onchange={handleToggleChange}>
+                                </lightning-input>
+                            </div>
+
+                            <div class="slds-var-m-top_medium">
+                                <lightning-input
+                                    type="toggle"
+                                    label="Global Sync Active (Kill Switch)"
+                                    checked={form.syncActive}
+                                    data-field="syncActive"
+                                    onchange={handleToggleChange}>
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Webhook URL Box -->
+                    <div class="slds-box slds-theme_shade slds-var-m-top_large">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-col slds-grow">
+                                <div class="slds-text-title_bold">Your Dedicated Shopify Webhook URL:</div>
+                                <div class="endpoint-url font-mono">{settings.webhookEndpoint}</div>
+                                <div class="slds-text-body_small slds-text-color_weak slds-var-m-top_xx-small">
+                                    Copy this endpoint and paste into your Shopify Admin $\rightarrow$ Settings $\rightarrow$ Notifications $\rightarrow$ Webhooks.
+                                </div>
+                            </div>
+                            <div class="slds-col slds-no-flex">
+                                <lightning-button
+                                    label="Copy URL"
+                                    icon-name="utility:copy"
+                                    onclick={handleCopyWebhookUrl}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </lightning-tab>
+
+                <!-- Tab 3: Webhook Simulator -->
+                <lightning-tab label="Simulate Webhook" value="simulator" icon-name="utility:trailhead_alt">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                            <lightning-combobox
+                                name="sampleTopic"
+                                label="Webhook Topic to Test"
+                                value={simulatorTopic}
+                                options={simulatorTopicOptions}
+                                onchange={handleSimulatorTopicChange}>
+                            </lightning-combobox>
+
+                            <div class="slds-var-m-top_medium">
+                                <lightning-button
+                                    label="Dispatch Simulated Webhook"
+                                    variant="brand"
+                                    icon-name="utility:send"
+                                    onclick={handleDispatchSimulation}
+                                    disabled={isSimulating}>
+                                </lightning-button>
+                            </div>
+                        </div>
+
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                            <lightning-textarea
+                                label="Simulation Payload (JSON)"
+                                value={simulatorPayload}
+                                onchange={handleSimulatorPayloadChange}
+                                rows="10"
+                                class="font-mono">
+                            </lightning-textarea>
+                        </div>
+                    </div>
+                </lightning-tab>
+            </lightning-tabset>
+        </div>
+    </lightning-card>
+</template>

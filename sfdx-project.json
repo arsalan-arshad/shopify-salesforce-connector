@@ -1,0 +1,20 @@
+{
+  "packageDirectories": [
+    {
+      "versionName": "ver 0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "path": "force-app",
+      "default": true,
+      "package": "ShopifySalesforceConnector",
+      "versionDescription": "Universal Shopify ↔ Salesforce Connector - 100% Free Open-Source horizontal e-commerce sync bridge."
+    }
+  ],
+  "name": "shopify-salesforce-connector",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "61.0",
+  "packageAliases": {
+    "ShopifySalesforceConnector": "0Hog70000003qksCAA",
+    "ShopifySalesforceConnector@0.1.0-1": "04tg7000000WE31AAG"
+  }
+}

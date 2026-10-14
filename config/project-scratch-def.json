@@ -1,0 +1,13 @@
+{
+  "orgName": "Universal Shopify Connector Scratch Org",
+  "edition": "Developer",
+  "features": ["EnableSetPasswordInApi"],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "orderSettings": {
+      "enableOrders": true
+    }
+  }
+}

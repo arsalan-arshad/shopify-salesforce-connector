@@ -1,0 +1,77 @@
+<template>
+    <lightning-card title="Shopify Store Sync" icon-name="custom:custom68">
+        <div slot="actions">
+            <template lwc:if={hasShopifyId}>
+                <lightning-button
+                    label="Open in Shopify Admin"
+                    icon-name="utility:new_window"
+                    variant="neutral"
+                    onclick={handleOpenShopifyAdmin}>
+                </lightning-button>
+            </template>
+        </div>
+
+        <div class="slds-var-p-around_medium">
+            <div class="slds-grid slds-grid_vertical-align-center slds-gutters_small">
+                <div class="slds-col slds-no-flex">
+                    <span class={statusBadgeClass}>{statusText}</span>
+                </div>
+                <div class="slds-col slds-grow">
+                    <template lwc:if={hasShopifyId}>
+                        <div class="slds-text-body_small">
+                            <strong>Shopify ID:</strong> <span class="font-mono">{shopifyId}</span>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <div class="slds-text-body_small slds-text-color_weak">
+                            This record has not been linked to a Shopify storefront yet.
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <template lwc:if={hasShopifyId}>
+                <div class="slds-grid slds-wrap slds-gutters slds-var-m-top_small border-top">
+                    <template lwc:if={isContact}>
+                        <div class="slds-col slds-size_1-of-2 slds-var-p-top_x-small">
+                            <div class="stat-label">Lifetime Spend</div>
+                            <div class="stat-value">{totalSpent}</div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-var-p-top_x-small">
+                            <div class="stat-label">Total Orders</div>
+                            <div class="stat-value">{orderCount}</div>
+                        </div>
+                    </template>
+
+                    <template lwc:if={isOrder}>
+                        <div class="slds-col slds-size_1-of-2 slds-var-p-top_x-small">
+                            <div class="stat-label">Financial Status</div>
+                            <div class="stat-value capitalize">{financialStatus}</div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-var-p-top_x-small">
+                            <div class="stat-label">Fulfillment Status</div>
+                            <div class="stat-value capitalize">{fulfillmentStatus}</div>
+                        </div>
+                    </template>
+
+                    <template lwc:if={isLead}>
+                        <div class="slds-col slds-size_1-of-2 slds-var-p-top_x-small">
+                            <div class="stat-label">Abandoned Cart Value</div>
+                            <div class="stat-value">{cartValue}</div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-var-p-top_x-small">
+                            <template lwc:if={cartUrl}>
+                                <lightning-button
+                                    label="Recover Cart Link"
+                                    icon-name="utility:link"
+                                    variant="base"
+                                    onclick={handleOpenCartUrl}>
+                                </lightning-button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

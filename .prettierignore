@@ -1,0 +1,6 @@
+node_modules/
+.sf/
+.sfdx/
+coverage/
+assets/
+force-app/main/default/lwc/**/*.html

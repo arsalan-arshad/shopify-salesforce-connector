@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Shopify_Abandoned_Items__c</fullName>
+    <deprecated>false</deprecated>
+    <description>Formatted summary of products and quantities left in the abandoned cart.</description>
+    <externalId>false</externalId>
+    <label>Shopify Abandoned Items</label>
+    <length>32768</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

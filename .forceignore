@@ -1,0 +1,23 @@
+# LWC Jest tests
+**/__tests__/**
+
+# Package files
+package.json
+package-lock.json
+README.md
+CONTRIBUTING.md
+.gitignore
+.forceignore
+.eslintrc.json
+.prettierrc
+.prettierignore
+.env
+.env.example
+node_modules/
+.git/
+.github/
+assets/**
+src/**
+test/**
+interactive_demo.html
+APPEXCHANGE_LISTING.md

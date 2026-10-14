@@ -1,18 +1,20 @@
 {
   "name": "shopify-salesforce-connector",
   "version": "0.1.0",
-  "description": "Open-source horizontal integration engine syncing Shopify orders, customers, and inventory to Salesforce CRM.",
+  "description": "Universal Shopify ↔ Salesforce Connector - 100% Free Open-Source horizontal e-commerce sync bridge.",
   "type": "module",
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "node --test test/**/*.test.js",
+    "lint": "eslint src/**/*.js test/**/*.js",
+    "prettier": "prettier --write \"**/*.{js,json,md,html}\"",
+    "prettier:check": "prettier --check \"**/*.{js,json,md,html}\""
   },
   "dependencies": {
-    "@salesforce/core": "^8.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
-    "jsforce": "^2.0.0"
+    "jsforce": "^1.11.1"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
