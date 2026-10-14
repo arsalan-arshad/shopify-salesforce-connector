@@ -1,0 +1,66 @@
+name: Release - Package & GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish-release:
+    name: Publish Release & Package Assets
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Test Suite
+        run: npm test
+
+      - name: Extract Tag & Version
+        id: vars
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: Release ${{ steps.vars.outputs.tag }} - Universal Shopify ↔ Salesforce Connector
+          body: |
+            ## 🚀 Universal Shopify ↔ Salesforce Connector `${{ steps.vars.outputs.tag }}`
+
+            ### 📦 2GP Package Installation Links
+            - **Production / Developer Edition:** [Install in Production](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG)
+            - **Sandbox:** [Install in Sandbox](https://test.salesforce.com/packaging/installPackage.apexp?p0=04tg7000000WE31AAG)
+            - **Package ID:** `04tg7000000WE31AAG`
+
+            ### ⚡ What's New in This Release
+            - **Zero Per-Task Pricing:** 100% open-source integration running on webhooks without middleware fees.
+            - **Real-Time Customer Sync:** Real-time ingestion on `customers/create` and `customers/update` with email/phone deduplication.
+            - **Real-Time Order & Line Item Sync:** Syncs orders and line items directly to Salesforce Order & Opportunity.
+            - **High-Value Abandoned Cart Lead Recovery:** Automatically creates a Salesforce Lead and follow-up Task when carts exceed threshold.
+            - **Bi-directional Fulfillment Sync:** Outbound fulfillment push back to Shopify Admin REST API.
+            - **Dead-Letter Queue (DLQ) Dashboard:** `Shopify_Sync_Log__c` and setup LWC with 1-click event replay.
+
+            ### 🛠️ Verification & Quality
+            - **Apex Code Coverage:** $\ge 85\%$
+            - **Cryptographic Security:** HMAC-SHA256 timing-attack resilient verification
+            - **Architecture:** `WITH USER_MODE`, `with sharing`, SLDS Design System
+          draft: false
+          prerelease: false
